@@ -1,0 +1,241 @@
+package FeatureBuilding;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.xml.sax.SAXException;
+
+import DumpHandler.Anchor;
+import DumpHandler.DBpediaType;
+import DumpHandler.Dictionary;
+import DumpHandler.ID;
+import DumpHandler.Printer;
+import DumpHandler.Tuple;
+
+public class EntityAnalyser {
+	
+	private Dictionary anchorLinkDictionary;
+	private GraphPatternAnalyser patternAnalyser;
+	private PrintWriter writer;
+	
+
+	public EntityAnalyser(Dictionary anchorLinkDictionary) {
+		super();
+		this.anchorLinkDictionary = anchorLinkDictionary;
+		this.patternAnalyser = new GraphPatternAnalyser ();
+	}
+	
+	public String getCategoriesString (ID entity)
+	{
+		String categoriesString= " ";
+		
+		for (String currentCategory : entity.getCategories())
+		{
+			categoriesString += currentCategory + " ";
+		}
+		
+		return categoriesString;
+	}
+	
+	private void buildVowpalInstance (ID entityCanonic, ID entityCandidate, boolean positive) throws IOException, ParserConfigurationException, SAXException, XPathExpressionException, ParseException
+	{		
+		String featureLine; //feature input format to of Vowpal Wabbit
+		
+		if (positive == true)
+		{
+			featureLine = "1 |a_CanonicCategory " + getCategoriesString(entityCanonic) + "|b_IngoingLinksToCanonic b1:"+ getNumberOfIngoing(entityCanonic) + " |c_OutgoingLinksFromCanonic c1:"+ getNumberOfOutgoing(entityCanonic) +  String.format(" |d_PageRankCanonic d1:%.6f",entityCanonic.getPageRank()).replace(",", ".") + " |e_NumberOfListeners e1:" + getNumberOfListeners(entityCanonic,entityCandidate) +" |f_NumberOfSpokesmen f1:" + getNumberOfSpokesmen(entityCanonic,entityCandidate) + " |g_NumberOfOneHops g1:" + getNumberOfOneHopTransferers(entityCanonic,entityCandidate) + " |h_NumberOfAdditionalDirectConnections h1:" + getNumberOfAdditionalDirectInterconnections(entityCanonic,entityCandidate) + " |i_CandidateCategory "+ getCategoriesString(entityCandidate) + "|j_IngoingLinksToCandidate j1:"+ getNumberOfIngoing(entityCandidate) + " |k_OutgoingLinkFromCandidate k1:"+ getNumberOfOutgoing(entityCandidate) + String.format(" |l_PageRankCandidate l1:%.6f",entityCandidate.getPageRank()).replace(",", ".");	
+			writer.println(featureLine);
+			//Printer.print("Positive instance created between " + entityCanonic.getName() + " and " + entityCandidate.getName(), featureLine);
+		}
+		else
+		{
+			featureLine = "-1 |a_CanonicCategory " + getCategoriesString(entityCanonic) + "|b_IngoingLinksToCanonic b1:"+ getNumberOfIngoing(entityCanonic) + " |c_OutgoingLinksFromCanonic c1:"+ getNumberOfOutgoing(entityCanonic) +  String.format(" |d_PageRankCanonic d1:%.6f",entityCanonic.getPageRank()).replace(",", ".") + " |e_NumberOfListeners e1:" + getNumberOfListeners(entityCanonic,entityCandidate) +" |f_NumberOfSpokesmen f1:" + getNumberOfSpokesmen(entityCanonic,entityCandidate) + " |g_NumberOfOneHops g1:" + getNumberOfOneHopTransferers(entityCanonic,entityCandidate) + " |h_NumberOfAdditionalDirectConnections h1:" + getNumberOfAdditionalDirectInterconnections(entityCanonic,entityCandidate) + " |i_CandidateCategory "+ getCategoriesString(entityCandidate) + "|j_IngoingLinksToCandidate j1:"+ getNumberOfIngoing(entityCandidate) + " |k_OutgoingLinkFromCandidate k1:"+ getNumberOfOutgoing(entityCandidate) + String.format(" |l_PageRankCandidate l1:%.6f",entityCandidate.getPageRank()).replace(",", ".");	
+			writer.println(featureLine);
+			//Printer.print("Negative instance created between " + entityCanonic.getName() + " and " + entityCandidate.getName(), featureLine);
+		}	
+		
+	}
+
+	
+	public int getNumberOfOutgoing (ID entity)
+	{
+		return entity.getNumberOfOutgoing();
+	}
+	
+	public int getNumberOfIngoing (ID entity)
+	{
+		return entity.getNumberOfIngoing();	
+	}
+	
+	public int getNumberOfListeners (ID entity1, ID entity2)
+	{
+		return patternAnalyser.getNumberOfListeners(entity1, entity2);
+	}
+	
+	public int getNumberOfSpokesmen (ID entity1, ID entity2)
+	{
+		return patternAnalyser.getNumberOfSpokesmen(entity1, entity2);
+	}
+	
+	public int getNumberOfOneHopTransferers (ID entity1, ID entity2)
+	{
+		return patternAnalyser.getNumberOfOneHopTransferers(entity1, entity2);
+	}	
+
+	public int getNumberOfAdditionalDirectInterconnections (ID entity1, ID entity2)
+	{
+		return patternAnalyser.getNumberOfAdditionalDirectInterconnections(entity1, entity2);
+	}
+	
+	public void analyse (String entityID)
+	{
+		HashMap <String,ID> list = null;
+		ID entity = null;
+		
+		if ((list = anchorLinkDictionary.getIDs()) != null)
+				list = anchorLinkDictionary.getIDs();
+		if ((entity = list.get(entityID)) != null)
+		{
+			System.out.println ("------Data concerning entity - " + entity.getName() + " ------");
+			System.out.println("Number of outgoing links - " + entity.getNumberOfOutgoing());
+			System.out.println("Number of ingoing links - " + entity.getNumberOfIngoing());
+			System.out.println("Page rank - " + entity.getPageRank());
+			
+			if (entity.getIngoingTuples().size() != 0)
+			{	
+				System.out.println("Connected entities - ");
+				if (entity.getIngoingTuples().size() != 0)
+					{
+						System.out.println("--Entities linking here--");
+						for (Tuple <Anchor,ID> refferencedID: entity.getIngoingTuples())
+								System.out.println("\t - " + refferencedID.getSecond().getName() + "\t\t\t throug anchor " + refferencedID.getFirst().getName() );
+					}
+				if (entity.getOutgoingTuples().size() != 0)
+				{
+					System.out.println("--Entities linked from here--");
+					for (Tuple <Anchor,ID> refferencedID: entity.getOutgoingTuples())
+							System.out.println("\t - " + refferencedID.getSecond().getName() + "\t\t\t throug anchor " + refferencedID.getFirst().getName() );
+				}
+				
+			}
+			
+			
+			if (entity.getCategories().size() != 0 )
+			{	
+				System.out.println("Categories - ");
+						System.out.println("--Entity is part of categories--");
+						for (String category: entity.getCategories())
+								System.out.println("\t - " + category );
+				
+			}
+			
+			if (entity.getDBpediaTypes().size() != 0 )
+			{	
+				System.out.println("DBpedia Types - ");
+						System.out.println("--Entity is of DBpedia types--");
+						for (Object type: entity.getDBpediaTypes())
+								System.out.println("\t - " + ((DBpediaType)type).getType());
+				
+			}
+			
+			
+		}
+		
+	}
+	
+ 	public void generatePositive (Dictionary anchorLink, String trueFileName) throws IOException, ParserConfigurationException, SAXException, XPathExpressionException, ParseException
+	{	
+ 		//create an list of visited nodes
+ 		HashSet <ID> visited = new HashSet<ID>();
+ 		this.writer = new PrintWriter( trueFileName + ".txt", "UTF-8");
+ 		Printer.print("Started generating positive examples","");
+		 		
+ 		//take each element of the ID list
+ 		//take each element it is pointing to (because each pointing to is also somewhere documented as pointing in, what we dont need for duplicities)
+ 		
+ 		for (Object canonicElement : anchorLink.getIDs().values())
+ 		{
+ 			visited.add(((ID)canonicElement));
+ 			//take each element it is pointing to (because each pointing to is also somewhere documented as pointing in, what we dont need for duplicities)
+ 			for (ID candidateEntity : ((ID)canonicElement).getOutgoingIDs())
+ 			{
+ 				//If the element is not listed in the ID list before, create an positive association (in case of double linking bothsided, we will otherwise have duplicities)
+ 		 		if (!visited.contains(candidateEntity))
+ 		 		{
+ 		 			buildVowpalInstance (((ID)canonicElement), candidateEntity, true);
+ 		 		}
+ 			}
+ 		}
+ 		this.writer.close();
+	}
+
+ 	public void generateNegative (Dictionary anchorLink, String falseFileName) throws IOException, ParserConfigurationException, SAXException, XPathExpressionException, ParseException
+	{	
+ 		//create an list of visited nodes
+ 		//ArrayList <Tuple<ID,ID>> visited = new <ID>ArrayList();
+ 		HashMap<ID,HashSet <ID>> visited = new HashMap<ID,HashSet <ID>>();
+ 		Boolean skip = false;
+ 		this.writer = new PrintWriter( falseFileName + ".txt", "UTF-8");
+ 		Printer.print("Started generating negative examples","");
+		 		
+ 		//take each element of the ID list
+ 		//take each element it is pointing to (because each pointing to is also somewhere documented as pointing in, what we dont need for duplicities)
+ 		
+ 		for (Object canonicEntity : anchorLink.getIDs().values())
+ 		{
+ 			//list all of the anchors that the canonicID has
+ 			for (Tuple<Anchor,ID> tuple : ((ID)canonicEntity).getOutgoingTuples())
+ 			{
+ 				//we get anchor and the entire list of where this anchor links without the entity the list truly points to
+ 				ArrayList <ID> referencedIDs = tuple.getFirst().getAllReferencedIDs();
+ 				
+ 				for (ID candidateEntity : referencedIDs)
+ 				{
+ 					if (!((ID)canonicEntity).getOutgoingIDs().contains(candidateEntity))
+ 					{
+ 						skip = false;
+ 						
+ 						HashSet<ID> list = null;
+ 						if (visited.containsKey(candidateEntity))
+ 						{
+ 							list = visited.get(candidateEntity);
+ 						}
+ 						if (visited.containsKey(canonicEntity))
+ 						{
+ 							list = visited.get(canonicEntity);
+ 						}
+ 						
+ 						if (list != null)
+ 						{
+ 							if (list.contains(canonicEntity) || list.contains(candidateEntity) )
+ 								break;
+ 						}
+	 					
+ 					//-----we get here only, if we are not breaked in before
+ 						
+ 						buildVowpalInstance (((ID)canonicEntity), candidateEntity, false);
+ 						
+ 						if (list == null)
+ 							list = new HashSet<ID>();
+ 						
+ 						list.add(candidateEntity);
+ 						visited.put((ID)canonicEntity, list);
+	 						
+  					}
+ 				}
+ 			}
+ 		}
+ 		this.writer.close();
+ 		
+	}
+ 	
+}
