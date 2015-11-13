@@ -1,9 +1,7 @@
 package FeatureBuilding;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,14 +34,31 @@ public class EntityAnalyser {
 	
 	public String getCategoriesString (ID entity)
 	{
-		String categoriesString= " ";
+		String categoriesString= "";
 		
 		for (String currentCategory : entity.getCategories())
 		{
 			categoriesString += currentCategory + " ";
 		}
 		
+		if (categoriesString.length() > 0)
+			categoriesString = categoriesString.substring(0, categoriesString.length()-1);
 		return categoriesString;
+	}
+	
+	public String getDBpediaTypesString (ID entity)
+	{
+		String DBpediaTypeString= "";
+		
+		for (DBpediaType currentDBpediaType : entity.getDBpediaTypes())
+		{
+			DBpediaTypeString += currentDBpediaType.getType() + " ";
+		}
+		
+		if (DBpediaTypeString.length() > 0)
+			DBpediaTypeString = DBpediaTypeString.substring(0, DBpediaTypeString.length()-1);
+		
+		return DBpediaTypeString;
 	}
 	
 	private void buildVowpalInstance (ID entityCanonic, ID entityCandidate, boolean positive) throws IOException, ParserConfigurationException, SAXException, XPathExpressionException, ParseException
@@ -52,20 +67,19 @@ public class EntityAnalyser {
 		
 		if (positive == true)
 		{
-			featureLine = "1 |a_CanonicCategory " + getCategoriesString(entityCanonic) + "|b_IngoingLinksToCanonic b1:"+ getNumberOfIngoing(entityCanonic) + " |c_OutgoingLinksFromCanonic c1:"+ getNumberOfOutgoing(entityCanonic) +  String.format(" |d_PageRankCanonic d1:%.6f",entityCanonic.getPageRank()).replace(",", ".") + " |e_NumberOfListeners e1:" + getNumberOfListeners(entityCanonic,entityCandidate) +" |f_NumberOfSpokesmen f1:" + getNumberOfSpokesmen(entityCanonic,entityCandidate) + " |g_NumberOfOneHops g1:" + getNumberOfOneHopTransferers(entityCanonic,entityCandidate) + " |h_NumberOfAdditionalDirectConnections h1:" + getNumberOfAdditionalDirectInterconnections(entityCanonic,entityCandidate) + " |i_CandidateCategory "+ getCategoriesString(entityCandidate) + "|j_IngoingLinksToCandidate j1:"+ getNumberOfIngoing(entityCandidate) + " |k_OutgoingLinkFromCandidate k1:"+ getNumberOfOutgoing(entityCandidate) + String.format(" |l_PageRankCandidate l1:%.6f",entityCandidate.getPageRank()).replace(",", ".");	
+			featureLine = "1 |a_CanonicCategory " + getCategoriesString(entityCanonic) + "|b_IngoingLinksToCanonic b1:"+ getNumberOfIngoing(entityCanonic) + " |c_OutgoingLinksFromCanonic c1:"+ getNumberOfOutgoing(entityCanonic) +  String.format(" |d_PageRankCanonic d1:%.6f",entityCanonic.getPageRank()).replace(",", ".") + " |e_DBpediaTypes " + getDBpediaTypesString(entityCanonic) + " |f_NumberOfListeners f1:" + getNumberOfListeners(entityCanonic,entityCandidate) +" |g_NumberOfSpokesmen g1:" + getNumberOfSpokesmen(entityCanonic,entityCandidate) + " |h_NumberOfOneHops h1:" + getNumberOfOneHopTransferers(entityCanonic,entityCandidate) + " |i_NumberOfAdditionalDirectConnections i1:" + getNumberOfAdditionalDirectInterconnections(entityCanonic,entityCandidate) + " |j_CandidateCategory "+ getCategoriesString(entityCandidate) + "|k_IngoingLinksToCandidate k1:"+ getNumberOfIngoing(entityCandidate) + " |l_OutgoingLinkFromCandidate l1:"+ getNumberOfOutgoing(entityCandidate) + String.format(" |m_PageRankCandidate m1:%.6f",entityCandidate.getPageRank()).replace(",", ".") + " |n_DBpediaTypes " + getDBpediaTypesString(entityCandidate);	
 			writer.println(featureLine);
 			//Printer.print("Positive instance created between " + entityCanonic.getName() + " and " + entityCandidate.getName(), featureLine);
 		}
 		else
 		{
-			featureLine = "-1 |a_CanonicCategory " + getCategoriesString(entityCanonic) + "|b_IngoingLinksToCanonic b1:"+ getNumberOfIngoing(entityCanonic) + " |c_OutgoingLinksFromCanonic c1:"+ getNumberOfOutgoing(entityCanonic) +  String.format(" |d_PageRankCanonic d1:%.6f",entityCanonic.getPageRank()).replace(",", ".") + " |e_NumberOfListeners e1:" + getNumberOfListeners(entityCanonic,entityCandidate) +" |f_NumberOfSpokesmen f1:" + getNumberOfSpokesmen(entityCanonic,entityCandidate) + " |g_NumberOfOneHops g1:" + getNumberOfOneHopTransferers(entityCanonic,entityCandidate) + " |h_NumberOfAdditionalDirectConnections h1:" + getNumberOfAdditionalDirectInterconnections(entityCanonic,entityCandidate) + " |i_CandidateCategory "+ getCategoriesString(entityCandidate) + "|j_IngoingLinksToCandidate j1:"+ getNumberOfIngoing(entityCandidate) + " |k_OutgoingLinkFromCandidate k1:"+ getNumberOfOutgoing(entityCandidate) + String.format(" |l_PageRankCandidate l1:%.6f",entityCandidate.getPageRank()).replace(",", ".");	
+			featureLine = "-1 |a_CanonicCategory " + getCategoriesString(entityCanonic) + "|b_IngoingLinksToCanonic b1:"+ getNumberOfIngoing(entityCanonic) + " |c_OutgoingLinksFromCanonic c1:"+ getNumberOfOutgoing(entityCanonic) +  String.format(" |d_PageRankCanonic d1:%.6f",entityCanonic.getPageRank()).replace(",", ".") + " |e_DBpediaTypes " + getDBpediaTypesString(entityCanonic) + " |f_NumberOfListeners f1:" + getNumberOfListeners(entityCanonic,entityCandidate) +" |g_NumberOfSpokesmen g1:" + getNumberOfSpokesmen(entityCanonic,entityCandidate) + " |h_NumberOfOneHops h1:" + getNumberOfOneHopTransferers(entityCanonic,entityCandidate) + " |i_NumberOfAdditionalDirectConnections i1:" + getNumberOfAdditionalDirectInterconnections(entityCanonic,entityCandidate) + " |j_CandidateCategory "+ getCategoriesString(entityCandidate) + "|k_IngoingLinksToCandidate k1:"+ getNumberOfIngoing(entityCandidate) + " |l_OutgoingLinkFromCandidate l1:"+ getNumberOfOutgoing(entityCandidate) + String.format(" |m_PageRankCandidate m1:%.6f",entityCandidate.getPageRank()).replace(",", ".") + " |n_DBpediaTypes " + getDBpediaTypesString(entityCandidate);	
 			writer.println(featureLine);
 			//Printer.print("Negative instance created between " + entityCanonic.getName() + " and " + entityCandidate.getName(), featureLine);
 		}	
 		
 	}
 
-	
 	public int getNumberOfOutgoing (ID entity)
 	{
 		return entity.getNumberOfOutgoing();

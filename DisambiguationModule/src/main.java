@@ -52,8 +52,8 @@ public class main {
 		
 		PrintWriter writer = new PrintWriter("IDs.txt", "UTF-8");
 		
-		String wikiPath = "C:\\Users\\User\\Desktop\\Skoly\\Java_Workspace\\DisambiguationModule\\simplewiki-latest-pages-articles.xml";
-		//String wikiPath = "C:\\Users\\User\\Desktop\\Skoly\\Java_Workspace\\WikipediaParser\\enwiki-20150304-pages-articles.xml";
+		String wikiPath = "simplewiki-latest-pages-articles.xml";
+		//String wikiPath = "enwiki-20150304-pages-articles.xml";
 		
 		Dictionary anchorLinkDictionary = new Dictionary();
 		RedirectList listOfRedirects = new RedirectList();
@@ -73,12 +73,12 @@ public class main {
 		
 		dbPediaFetcher.updateEntities(anchorLinkDictionary, "instance-types_en.ttl");
 		
-		//analyser.generatePositive(anchorLinkDictionary,"positiveExamples");
-		//analyser.generateNegative(anchorLinkDictionary,"negativeExamples");
+		analyser.generatePositive(anchorLinkDictionary,"positiveExamples");
+		analyser.generateNegative(anchorLinkDictionary,"negativeExamples");
 		
 		
 		
-		
+		/*
 		double max = 0;
 		ID bestPageRankedPage = null;
 		for (Object o :  anchorLinkDictionary.getIDs().values())
@@ -94,7 +94,7 @@ public class main {
 		EntityAnalyser entityAnalyser = new EntityAnalyser (anchorLinkDictionary);
 		String entityID = bestPageRankedPage.getName();
 		entityAnalyser.analyse(entityID);
-		
+		*/
 		
 		
 		/*

@@ -29,7 +29,8 @@ public class GraphPatternAnalyser {
 			if (list2.contains(o))
 				counter++;
 			}
-					
+
+		
 		return counter;
 	}
 	
@@ -57,7 +58,7 @@ public class GraphPatternAnalyser {
 				counter++;
 		}
 		
-		if (counter>1)
+		if (counter>0)
 			counter--;
 					
 		return counter;

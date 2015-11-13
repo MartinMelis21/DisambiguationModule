@@ -32,6 +32,8 @@ public class DBPediaFetcher {
 			
 			HashMap <String, ID> IDs = anchorLinks.getIDs();
 			
+			Printer.print("Updateing DBpedia Types", "");
+			
 			while ((currentLine = br.readLine()) != null) 
 			{
 				Tuple <String,String > tuple = fetchData (currentLine);
@@ -92,6 +94,7 @@ public class DBPediaFetcher {
 		    	 if (dBpediaType.startsWith(" "))
 		    		 dBpediaType = entityID.substring(1);
 		    	 dBpediaType = dBpediaType.replace(' ', '_');
+		    	 dBpediaType = dBpediaType.replace(':', '_');
 		    	 dBpediaType = dBpediaType.toLowerCase();
 	    	  }
 	      } 

@@ -233,13 +233,10 @@ public class DumpFetcher extends DefaultHandler{
 			     	{  				    	 
 				    	 x = start;
 				    	 boolean isReading = false;
-				    	 boolean isReadingCategory = false;
 				    	 String link = "";
 				    	 String anchor = "";
 				    	 String anchorLinkText = "";
 				    	 String categoryName = "";
-				    	 int i;
-				    	 String linkPrefix;
 				    	 Tuple <Anchor,ID> context = null;
 				    	 	
 				    	 //------------First we create an unique Entity if it was not created (ignoring redirects)---------				    	 	   	 	
@@ -258,7 +255,7 @@ public class DumpFetcher extends DefaultHandler{
 					    	 	if (isReading == true && ch[x] == ']' && ch[x+1] == ']')
 						    	{
 					    	 		
-					    	 		if ((anchorLinkText.length()>0) && !anchorLinkText.matches("") && !anchorLinkText.endsWith("| ") && (anchorLinkText.charAt(0) != ('#')) && ( ! anchorLinkText.contains("{")) && ( ! anchorLinkText.contains("}"))  && ( ! anchorLinkText.contains("$")))	//osetrenie, ak clanok staticky ukazuje sam na seba, alebo do seba
+					    	 		if ((anchorLinkText.length()>0) && !anchorLinkText.matches("") && (anchorLinkText.charAt(0) != ('#')) && ( ! anchorLinkText.contains("{")) && ( ! anchorLinkText.contains("}"))  && ( ! anchorLinkText.contains("$")))	//osetrenie, ak clanok staticky ukazuje sam na seba, alebo do seba
 						    	 		{
 							    	 		if (anchorLinkText.contains("#"))//ak ukazuje do vnutrajsku nejakeho clanku, tak mazem zo stringu vsetko od # az po | resp koniec Stringu
 							    	 			{
@@ -286,11 +283,10 @@ public class DumpFetcher extends DefaultHandler{
 								    	 			String category = new String (categoryName);
 								    	 			categories.addCategory(category);
 								    	 			currentlyProcessedEntity.addCategory(category);
-								    	 			isReadingCategory = false;
 								    	 		}
 								    	 	else
 								    	 	{
-									    	 	if (anchorLinkText.contains("|"))	//zachovavame tvar vypisu aj pre pre rovnomenne linky anchor-text
+									    	 	if (anchorLinkText.contains("|") && (!anchorLinkText.endsWith("| ")))	//zachovavame tvar vypisu aj pre pre rovnomenne linky anchor-text
 										    	 	{
 									    	 		
 									    	 			link = anchorLinkText.substring(0, anchorLinkText.indexOf('|'));	
