@@ -9,6 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
 import InputProcessing.*;
+import ResultAnalyser.ResultAnalyser;
 
 import org.xml.sax.SAXException;
 
@@ -33,6 +34,7 @@ public class main {
 
 	public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, XPathExpressionException, ParseException 
 	{
+		/*
 		ArrayList<String> canonicIDs = new ArrayList<String>();
 		canonicIDs.add("Springfield_(The_Simpsons)");
 		canonicIDs.add("Tom_Springfield");
@@ -75,7 +77,9 @@ public class main {
 		
 		analyser.generatePositive(anchorLinkDictionary,"positiveExamples");
 		analyser.generateNegative(anchorLinkDictionary,"negativeExamples");
-		
+		*/
+		ResultAnalyser ra = new ResultAnalyser ();
+		ra.evaluateResults(0.1);
 		
 		
 		/*
@@ -90,12 +94,15 @@ public class main {
 			}
 				
 		}
+		*/
+		/*
+		
 		
 		EntityAnalyser entityAnalyser = new EntityAnalyser (anchorLinkDictionary);
-		String entityID = bestPageRankedPage.getName();
-		entityAnalyser.analyse(entityID);
-		*/
+		String entityID = "atlanta";
+		entityAnalyser.analyse(entityID, "new_york");
 		
+		*/
 		
 		/*
 		Anchor america = (Anchor) anchorLinkDictionary.getAnchors().get("europe");				
@@ -112,7 +119,7 @@ public class main {
 		}
 		*/
 		
-		System.out.println ("Number of indexed IDs - " + anchorLinkDictionary.getIDs().size());
+		//System.out.println ("Number of indexed IDs - " + anchorLinkDictionary.getIDs().size());
 	
 		
 		//Print all IDs anchored by string America

@@ -48,8 +48,10 @@ public class DBPediaFetcher {
 					 	if (DBpediaTypes.containsKey(fetchedType))
 				    	  dBpediaTypeObject = DBpediaTypes.get(fetchedType);	      
 					 	else
+					 	{
 				    	  dBpediaTypeObject = new DBpediaType(fetchedType);
-					 
+					 	  DBpediaTypes.put(fetchedType, dBpediaTypeObject);
+					 	}
 					 
 						if (!wikiEntity.getDBpediaTypes().contains(dBpediaTypeObject))
 						{

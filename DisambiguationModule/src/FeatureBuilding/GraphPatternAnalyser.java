@@ -11,10 +11,9 @@ import DumpHandler.Tuple;
 public class GraphPatternAnalyser {
 
 	
-	public int getNumberOfOneHopTransferers (ID entity1, ID entity2)
+	public ArrayList<ID> getNumberOfOneHopTransferers (ID entity1, ID entity2)
 	{
-		int counter = 0;
-	
+		ArrayList<ID> oneHops = new ArrayList<ID> ();
 		
 		//get number of outgoingLinks from entity1
 		HashSet <ID> list1 = entity1.getOutgoingIDs();
@@ -27,11 +26,11 @@ public class GraphPatternAnalyser {
 		for (Object o : list1)
 			{
 			if (list2.contains(o))
-				counter++;
+				oneHops.add((ID) o);
 			}
 
 		
-		return counter;
+		return oneHops;
 	}
 	
 	public int getNumberOfAdditionalDirectInterconnections (ID entity1, ID entity2)
@@ -65,9 +64,10 @@ public class GraphPatternAnalyser {
 	}
 		
 	
-	public int getNumberOfListeners (ID entity1, ID entity2)
+	public ArrayList<ID> getNumberOfListeners (ID entity1, ID entity2)
 	{
-		int counter = 0;
+		ArrayList<ID> listeners = new ArrayList<ID> ();
+		
 		//get number of outgoing links from entity1
 		HashSet <ID> list1 = entity1.getOutgoingIDs();
 		
@@ -79,16 +79,17 @@ public class GraphPatternAnalyser {
 		for (Object o : list1)
 		{
 			if (list2.contains(o))
-				counter++;
+				listeners.add((ID) o);
 		}
 		
-		return counter;
+		return listeners;
 	}
 	
-	public int getNumberOfSpokesmen (ID entity1, ID entity2)
+	public ArrayList<ID>  getNumberOfSpokesmen (ID entity1, ID entity2)
 	{
 
-		int counter = 0;
+		ArrayList<ID> spokesmen = new ArrayList<ID> ();
+		
 		//get number of ingoing links to entity1
 		HashSet <ID> list1 = entity1.getIngoingIDs();
 		
@@ -100,9 +101,9 @@ public class GraphPatternAnalyser {
 		for (Object o : list1)
 		{
 			if (list2.contains(o))
-				counter++;
+				spokesmen.add((ID) o);
 		}
 		
-		return counter;
+		return spokesmen;
 	}
 }

@@ -92,17 +92,17 @@ public class EntityAnalyser {
 	
 	public int getNumberOfListeners (ID entity1, ID entity2)
 	{
-		return patternAnalyser.getNumberOfListeners(entity1, entity2);
+		return patternAnalyser.getNumberOfListeners(entity1, entity2).size();
 	}
 	
 	public int getNumberOfSpokesmen (ID entity1, ID entity2)
 	{
-		return patternAnalyser.getNumberOfSpokesmen(entity1, entity2);
+		return patternAnalyser.getNumberOfSpokesmen(entity1, entity2).size();
 	}
 	
 	public int getNumberOfOneHopTransferers (ID entity1, ID entity2)
 	{
-		return patternAnalyser.getNumberOfOneHopTransferers(entity1, entity2);
+		return patternAnalyser.getNumberOfOneHopTransferers(entity1, entity2).size();
 	}	
 
 	public int getNumberOfAdditionalDirectInterconnections (ID entity1, ID entity2)
@@ -110,7 +110,7 @@ public class EntityAnalyser {
 		return patternAnalyser.getNumberOfAdditionalDirectInterconnections(entity1, entity2);
 	}
 	
-	public void analyse (String entityID)
+	public void analyse (String entityID, String pairedEntityName)
 	{
 		HashMap <String,ID> list = null;
 		ID entity = null;
@@ -159,6 +159,35 @@ public class EntityAnalyser {
 						for (Object type: entity.getDBpediaTypes())
 								System.out.println("\t - " + ((DBpediaType)type).getType());
 				
+			}
+			ID pairedEntity = null;
+			if ((pairedEntity = list.get(pairedEntityName)) != null)
+			{
+				ArrayList <ID> listeners = patternAnalyser.getNumberOfListeners(entity, pairedEntity);
+				ArrayList <ID> spokesmen = patternAnalyser.getNumberOfSpokesmen(entity, pairedEntity);
+				ArrayList <ID> oneHops = patternAnalyser.getNumberOfOneHopTransferers(entity, pairedEntity);
+				
+				if (listeners.size() > 0)
+				{
+					System.out.println("Listeners with paired entity -"  + pairedEntity);
+					
+					for (Object type: listeners)
+							System.out.println("\t - " + ((ID)type).getName());
+				}
+				
+				if (listeners.size() > 0)
+				{
+					System.out.println("Spokesmen with paired entity -"  + pairedEntity);
+					for (Object type: spokesmen)
+						System.out.println("\t - " + ((ID)type).getName());
+				}
+				
+				if (listeners.size() > 0)
+				{
+					System.out.println("One Hops with paired entity -"  + pairedEntity);
+					for (Object type: oneHops)
+						System.out.println("\t - " + ((ID)type).getName());
+				}
 			}
 			
 			
